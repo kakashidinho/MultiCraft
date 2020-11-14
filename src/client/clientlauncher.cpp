@@ -590,8 +590,20 @@ bool ClientLauncher::create_engine_device()
 #ifdef __ANDROID__
 	params.PrivateData = porting::app_global;
 #endif
+	float max_fps = g_settings->getFloat("fps_max");
+	if (max_fps < 50)
+	{
+		// Fallback to use GLES1 on low-end iOS devices.
+		params.DriverType = irr::video::EDT_OGLES1;
+	}
+	else
+	{
+		params.DriverType = irr::video::EDT_OGLES2;
+	}
 	params.OGLES2ShaderPath = std::string(porting::path_share + DIR_DELIM +
 			"media" + DIR_DELIM + "shaders" + DIR_DELIM).c_str();
+#elif defined(__APPLE__)
+	params.OGLES2ShaderPath = (std::string("Shaders") + DIR_DELIM).c_str();
 #endif
 
 	device = createDeviceEx(params);
